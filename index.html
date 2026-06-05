@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Search Engine Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a5f;
+            --primary-light: #2c5282;
+            --accent-color: #d4af37;
+            --accent-hover: #aa8c2c;
+            --text-dark: #2d3748;
+            --text-light: #f7fafc;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --code-bg: #1a202c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-bottom: 5px solid var(--accent-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.95rem;
+        }
+
+        .meta-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .meta-item i {
+            margin-left: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        /* Container Layout */
+        .wrapper {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar Tabs Navigation */
+        .sidebar {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            text-align: right;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+            gap: 0.8rem;
+        }
+
+        .tab-btn i {
+            width: 20px;
+            text-align: center;
+            color: var(--primary-light);
+            transition: color 0.3s;
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(30, 58, 95, 0.05);
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .tab-btn.active i {
+            color: var(--accent-color);
+        }
+
+        /* Content Area */
+        .content-panel {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            min-height: 500px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* General Typography Inside Content */
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .description-box {
+            background-color: rgba(30, 58, 95, 0.03);
+            border-right: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: var(--text-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 4px 10px rgba(30, 58, 95, 0.15);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+        }
+
+        .stat-info h4 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .stat-info p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Tables Architecture */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tr:hover {
+            background-color: rgba(212, 175, 55, 0.08);
+        }
+
+        /* Pipeline Visualizer */
+        .pipeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            border: 1px dashed var(--primary-light);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pipe-step {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .pipe-step.active-step {
+            border-color: var(--accent-color);
+            background-color: rgba(212, 175, 55, 0.05);
+            color: var(--primary-color);
+        }
+
+        .pipe-arrow {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        /* Code Block Styling */
+        pre {
+            background-color: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .keyword { color: #f97316; }
+        .def { color: #38bdf8; }
+        .comment { color: #6b7280; font-style: italic; }
+        .string { color: #4ade80; }
+
+        /* Example Badges Box */
+        .example-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .example-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .token-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            direction: ltr;
+            justify-content: flex-end;
+        }
+
+        .token {
+            background-color: #edf2f7;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(to left, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.4rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .formula-box span {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Matrix Grid (Levenshtein) */
+        .matrix-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .matrix-table {
+            width: auto;
+            margin: 0 auto;
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+        }
+
+        .matrix-table th, .matrix-table td {
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .matrix-table th {
+            background-color: var(--primary-light);
+        }
+
+        .matrix-table td.highlight-cell {
+            background-color: rgba(212, 175, 55, 0.25);
+            font-weight: bold;
+            border: 2px solid var(--accent-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            .pipeline {
+                flex-direction: column;
+            }
+            .pipe-arrow {
+                transform: rotate(90deg);
+                margin: 0.3rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Build Your Own Mini Search Engine</h1>
+        <div class="project-meta">
+            <div class="meta-item"><i class="fa-solid fa-book-bookmark"></i>Information Retrieval Project</div>
+            <div class="meta-item"><i class="fa-solid fa-user"></i>الطالب: Dan</div>
+            <div class="meta-item"><i class="fa-solid fa-chalkboard-user"></i>المشرف: Dr. Mais Haj Qasem</div>
+            <div class="meta-item"><i class="fa-solid fa-calendar-days"></i>العام الأكاديمي: 2025-2026</div>
+        </div>
+    </header>
+
+    <div class="wrapper">
+        
+        <aside class="sidebar">
+            <h3>أجزاء المشروع</h3>
+            <button class="tab-btn active" onclick="openTab(event, 'part1')">
+                <i class="fa-solid fa-folder-open"></i> Part 1: Document Collection
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'part2')">
+                <i class="fa-solid fa-gears"></i> Part 2: Text Processing
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'part3')">
+                <i class="fa-solid fa-list-ol"></i> Part 3: Inverted Index
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'part4')">
+                <i class="fa-solid fa-calculator"></i> Part 4: Boolean Queries
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'part5')">
+                <i class="fa-solid fa-chart-simple"></i> Part 5: Jaccard Similarity
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'part6')">
+                <i class="fa-solid fa-arrow-down-9-1"></i> Part 6: Ranked Retrieval
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'part7')">
+                <i class="fa-solid fa-spell-check"></i> Part 7: Tolerant Retrieval
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'conclusion')">
+                <i class="fa-solid fa-flag-checkered"></i> الخاتمة والتطلعات المستقبلية
+            </button>
+        </aside>
+
+        <main class="content-panel">
+
+            <div id="part1" class="tab-content active">
+                <h2>Part 1 — Document Collection</h2>
+                <div class="description-box">
+                    تتكون هذه المرحلة من بناء وتجميع قاعدة البيانات الأساسية للمشروع. تم جمع <strong>20 وثيقة (Documents)</strong> نصية، حيث تمثل كل وثيقة أغنية عالمية مشهورة مشروحة في جملتين إلى 3 جمل تركز على طبيعة اللحن، والكلمات، والنوع الموسيقي.
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <i class="fa-solid fa-file-lines"></i>
+                        <div class="stat-info">
+                            <h4>20</h4>
+                            <p>إجمالي الوثائق (Docs)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fa-solid fa-font"></i>
+                        <div class="stat-info">
+                            <h4>122</h4>
+                            <p>المصطلحات الفريدة (Unique Terms)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-color), var(--accent-hover))">
+                        <i class="fa-solid fa-music" style="color: var(--primary-color)"></i>
+                        <div class="stat-info" style="color: var(--primary-color)">
+                            <h4>Music & Songs</h4>
+                            <p>نطاق ومجال البحث</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>عينة من أول 5 وثائق في قاعدة البيانات (Corpus):</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">ID</th>
+                            <th style="width: 25%;">اسم الأغنية والملحن</th>
+                            <th>الوصف النصي (Document Content)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>D1</strong></td>
+                            <td>Shape of You — Ed Sheeran</td>
+                            <td>pop song with catchy rhythm, acoustic guitar loops</td>
+                        </tr>
+                        <tr>
+                            <td><strong>D2</strong></td>
+                            <td>Blinding Lights — The Weeknd</td>
+                            <td>synth-pop retro song, energetic beats, electronic music</td>
+                        </tr>
+                        <tr>
+                            <td><strong>D3</strong></td>
+                            <td>Bohemian Rhapsody — Queen</td>
+                            <td>classic rock, rich blend of opera and heavy metal</td>
+                        </tr>
+                        <tr>
+                            <td><strong>D4</strong></td>
+                            <td>Bad Guy — Billie Eilish</td>
+                            <td>dark pop, minimalist electronic production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>D5</strong></td>
+                            <td>Stayin' Alive — Bee Gees</td>
+                            <td>classic disco song with infectious baseline and upbeat falsetto vocals</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="part2" class="tab-content">
+                <h2>Part 2 — Text Processing Pipeline</h2>
+                <div class="description-box">
+                    لتجهيز النصوص الخام وفهرستها بكفاءة، تمر الوثائق عبر خط معالجة متسلسل (Pipeline) لتنظيف الكلمات وتوحيدها للوصول للجذور اللغوية للمصطلحات.
+                </div>
+
+                <div class="pipeline">
+                    <div class="pipe-step active-step">1. Tokenization<br><small>تقطيع النص إلى كلمات</small></div>
+                    <div class="pipe-arrow"><i class="fa-solid fa-chevron-left"></i></div>
+                    <div class="pipe-step active-step">2. Normalization<br><small>تحويل الحروف لحالة صغيرة</small></div>
+                    <div class="pipe-arrow"><i class="fa-solid fa-chevron-left"></i></div>
+                    <div class="pipe-step active-step">3. Stop Words Removal<br><small>حذف الكلمات الشائعة (is, a...)</small></div>
+                    <div class="pipe-arrow"><i class="fa-solid fa-chevron-left"></i></div>
+                    <div class="pipe-step active-step">4. Stemming<br><small>خوارزمية Porter Stemmer</small></div>
+                </div>
+
+                <h3>تطبيق عملي لمحاذاة المعالجة على الوثيقة D1:</h3>
+                <div class="example-box">
+                    <div class="example-title"><i class="fa-solid fa-file-text"></i> النص الأصلي (Original Text):</div>
+                    <p style="direction: ltr; text-align: left; font-style: italic; background: #f7fafc; padding: 0.5rem; border-radius: 4px;">
+                        "Shape of You is a pop song featuring a catchy rhythm and romantic lyrics. It includes acoustic guitar loops."
+                    </p>
+                    
+                    <div class="example-title" style="margin-top: 1rem;"><i class="fa-solid fa-filter"></i> بعد حذف كلمات التوقف (After Stop Words Removal):</div>
+                    <div class="token-list">
+                        <span class="token">loops</span><span class="token">guitar</span><span class="token">acoustic</span><span class="token">includes</span><span class="token">lyrics</span><span class="token">romantic</span><span class="token">rhythm</span><span class="token">catchy</span><span class="token">featuring</span><span class="token">song</span><span class="token">pop</span><span class="token">shape</span>
+                    </div>
+
+                    <div class="example-title" style="margin-top: 1rem;"><i class="fa-solid fa-scissors"></i> بعد التجذير واستخراج الجذور (After Stemming):</div>
+                    <div class="token-list">
+                        <span class="token" style="border-color: var(--accent-color);">loop</span><span class="token" style="border-color: var(--accent-color);">guitar</span><span class="token" style="border-color: var(--accent-color);">acoust</span><span class="token" style="border-color: var(--accent-color);">includ</span><span class="token" style="border-color: var(--accent-color);">lyric</span><span class="token" style="border-color: var(--accent-color);">romant</span><span class="token" style="border-color: var(--accent-color);">rhythm</span><span class="token" style="border-color: var(--accent-color);">catchi</span><span class="token" style="border-color: var(--accent-color);">featur</span><span class="token" style="border-color: var(--accent-color);">song</span><span class="token" style="border-color: var(--accent-color);">pop</span><span class="token" style="border-color: var(--accent-color);">shape</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">كود بايثون لمعالجة النصوص (Python Implementation):</h3>
+<pre><span class="keyword">from</span> nltk.stem <span class="keyword">import</span> PorterStemmer
+<span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> stopwords
+
+stemmer = PorterStemmer()
+stop_words = set(stopwords.words(<span class="string">'english'</span>))
+
+<span class="keyword">def</span> <span class="def">process_document</span>(text):
+    <span class="comment"># Tokenization & Normalization</span>
+    tokens = text.lower().split()
+    <span class="comment"># Filter stop words and punctuation</span>
+    filtered_tokens = [t <span class="keyword">for</span> t <span class="keyword font-weight-bold">in</span> tokens <span class="keyword">if</span> t <span class="keyword">not</span> <span class="keyword font-weight-bold">in</span> stop_words]
+    <span class="comment"># Apply Porter Stemmer</span>
+    stemmed_tokens = [stemmer.stem(t) <span class="keyword">for</span> t <span class="keyword font-weight-bold">in</span> filtered_tokens]
+    <span class="keyword">return</span> stemmed_tokens</pre>
+            </div>
+
+            <div id="part3" class="tab-content">
+                <h2>Part 3 — Inverted Index Architecture</h2>
+                <div class="description-box">
+                    <strong>الفهرس المقلوب (Inverted Index)</strong> هو العمود الفقري لمحركات البحث. بدلاً من البحث عن الكلمات داخل المستندات، نقوم بربط كل مصطلح (Term) بقائمة المستندات التي يظهر بها (Posting List)، مما يجعل الاستعلامات فورية.
+                </div>
+
+                <div style="margin: 1rem 0; font-weight: 600; font-size: 1.05rem; text-align: center; color: var(--primary-light);">
+                    الهيكلية: <span style="font-family: monospace; background:#e2e8f0; padding: 2px 6px; border-radius:4px;">Term &rarr; Document Frequency (DF) &rarr; Posting List [Doc IDs]</span>
+                </div>
+
+                <h3>عينة من الفهرس المقلوب الفعلي للمشروع (122 Unique Terms):</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المصطلح (Term)</th>
+                            <th style="width: 25%;">تردد المصطلح بالأوراق (DF)</th>
+                            <th>قائمة المستندات المرتبطة (Posting List)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="font-family: monospace;">pop</strong></td>
+                            <td>13</td>
+                            <td><span class="token">D1</span>, <span class="token">D4</span>, <span class="token">D6</span>, <span class="token">D8</span>, <span class="token">D9</span>, <span class="token">D10</span>, <span class="token">D12</span>, <span class="token">D13</span>, <span class="token">D14</span>, <span class="token">D15</span>, <span class="token">D18</span>, <span class="token">D19</span>, <span class="token">D20</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong style="font-family: monospace;">rock</strong></td>
+                            <td>4</td>
+                            <td><span class="token">D3</span>, <span class="token">D5</span>, <span class="token">D11</span>, <span class="token">D17</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong style="font-family: monospace;">dark</strong></td>
+                            <td>4</td>
+                            <td><span class="token">D8</span>, <span class="token">D11</span>, <span class="token">D14</span>, <span class="token">D19</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong style="font-family: monospace;">guitar</strong></td>
+                            <td>4</td>
+                            <td><span class="token">D1</span>, <span class="token">D6</span>, <span class="token">D9</span>, <span class="token">D11</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong style="font-family: monospace;">song</strong></td>
+                            <td>19</td>
+                            <td>جميع المستندات من <span class="token">D1</span> إلى <span class="token">D20</span> باستثناء مستند <span class="token">D9</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 0.9rem; color: #64748b; font-style: italic;"><i class="fa-solid fa-circle-info"></i> نلاحظ أن الفهرس يختصر الوقت والجهد حيث يقفز مباشرة إلى المستندات المعنية بدون فحص شامل لقاعدة البيانات.</p>
+            </div>
+
+            <div id="part4" class="tab-content">
+                <h2>Part 4 — Boolean Queries Execution</h2>
+                <div class="description-box">
+                    يدعم محرك البحث الاستعلامات المنطقية المعقدة لدمج أو استثناء الكلمات باستخدام المعاملات المنطقية: <span class="token">AND</span>, <span class="token">OR</span>, <span class="token">AND NOT</span> عبر دمج القوائم (Merging Posting Lists).
+                </div>
+
+                <h3>نتائج الاستعلامات المنطقية المنفذة:</h3>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--primary-light); margin-bottom: 0.5rem;"><span class="token" style="background-color: var(--primary-color); color: white;">Q1</span> <code style="font-family: monospace;">classic AND rock</code></h4>
+                    <p style="margin-right: 1.5rem;"><strong>النتيجة المسترجعة:</strong> <span class="token">D3</span> (Bohemian Rhapsody), <span class="token">D11</span> (Hotel California)</p>
+                    <small style="color: #64748b; margin-right: 1.5rem; display:block;">الشرح: يتم إجراء عملية تقاطع (Intersection) بين القائمتين للحصول على المستندات المشتركة فقط.</small>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--primary-light); margin-bottom: 0.5rem;"><span class="token" style="background-color: var(--primary-color); color: white;">Q2</span> <code style="font-family: monospace;">rap OR disco</code></h4>
+                    <p style="margin-right: 1.5rem;"><strong>النتيجة المسترجعة:</strong> <span class="token">D7</span>, <span class="token">D10</span>, <span class="token">D13</span>, <span class="token">D16</span>, <span class="token">D18</span></p>
+                    <small style="color: #64748b; margin-right: 1.5rem; display:block;">الشرح: دمج (Union) القائمتين مع ترتيب العناصر تصاعدياً بدون تكرار.</small>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--primary-light); margin-bottom: 0.5rem;"><span class="token" style="background-color: var(--primary-color); color: white;">Q3</span> <code style="font-family: monospace;">pop AND NOT dark</code></h4>
+                    <p style="margin-right: 1.5rem;"><strong>النتيجة المسترجعة:</strong> <span class="token">D1</span>, <span class="token">D4</span>, <span class="token">D6</span>, <span class="token">D9</span>, <span class="token">D10</span>, <span class="token">D12</span>, <span class="token">D13</span>, <span class="token">D15</span>, <span class="token">D18</span>, <span class="token">D20</span></p>
+                    <small style="color: #64748b; margin-right: 1.5rem; display:block;">الشرح: استرجاع جميع مستندات pop واستبعاد أي مستند يظهر في قائمة المصطلح dark (Difference).</small>
+                </div>
+
+                <h3>خوارزمية دمج القوائم (Pseudocode):</h3>
+<pre><span class="keyword">function</span> <span class="def">boolean_and</span>(p1, p2):
+    answer = []
+    <span class="keyword">while</span> p1 is not empty <span class="keyword">and</span> p2 is not empty:
+        <span class="keyword">if</span> p1.docID == p2.docID:
+            answer.append(p1.docID)
+            p1 = p1.next; p2 = p2.next
+        <span class="keyword">elif</span> p1.docID < p2.docID: p1 = p1.next
+        <span class="keyword">else</span>: p2 = p2.next
+    <span class="keyword">return</span> answer
+
+<span class="keyword">function</span> <span class="def">boolean_or</span>(p1, p2):
+    answer = []
+    <span class="comment"># دمج القائمتين معاً بالترتيب وحذف المكرر</span>
+    ...
+    <span class="keyword">return</span> sorted_combined_list</pre>
+            </div>
+
+            <div id="part5" class="tab-content">
+                <h2>Part 5 — Jaccard Similarity</h2>
+                <div class="description-box">
+                    يُستخدم مقياس <strong>معامل جاكارد (Jaccard Coefficient)</strong> لقياس نسبة التشابه النصي والنوعي بين المستندات المختلفة بغض النظر عن حجم التكرار، بناءً على المجموعات المشتركة والكلية للمصطلحات.
+                </div>
+
+                <div class="formula-box">
+                    J(A, B) = |A &cap; B| / |A &cup; B|
+                </div>
+
+                <h3>مثال تطبيقي: حساب نسبة التشابه بين الوثيقة D1 و D6</h3>
+                <p>مستند <strong>D1 (Shape of You)</strong> ومستند <strong>D6 (Perfect)</strong>:</p>
+                
+                <div class="example-box" style="line-height: 2;">
+                    <i class="fa-solid fa-calculator" style="color:var(--accent-color);"></i> <strong>التقاطع النصي (Intersection - الكلمات المشتركة جُذرياً):</strong><br>
+                    <div class="token-list" style="margin-bottom: 1rem;"><span class="token">guitar</span><span class="token">acoust</span><span class="token">romant</span><span class="token font-weight-bold">featur</span><span class="token">song</span><span class="token">pop</span></div>
+                    عدد العناصر في التقاطع = <strong>6 مصطلحات</strong>.
+                    <br><br>
+                    <i class="fa-solid fa-circle-nodes" style="color:var(--accent-color);"></i> <strong>الاتحاد الكلي (Union - الكلمات الفريدة الكلية في كلا المستندين):</strong><br>
+                    عدد العناصر في الاتحاد الكلي = <strong>19 مصطلحاً فريداً</strong>.
+                    <br><br>
+                    <i class="fa-solid fa-square-poll-vertical" style="color:var(--accent-color);"></i> <strong>النتيجة النهائية لمعادلة جاكارد:</strong><br>
+                    <span style="font-family: monospace; font-size: 1.2rem; background: #e2e8f0; padding: 2px 10px; border-radius: 4px;">6 / 19 = 0.316</span>
+                </div>
+                
+                <h3 style="margin-top: 1.5rem;">الاستنتاج التحليلي:</h3>
+                <p>الحصول على النتيجة <strong>0.316</strong> تعني مظهر تشابه <strong>متوسط (Moderate Similarity)</strong>، وهو دقيق لغوياً وموسيقياً، حيث أن الأغنيتين لنفس الفنان (Ed Sheeran) وتتشاركان نفس البنية والنوع (Pop, acoustic guitar, romantic lyrics)، لكن تختلف الكلمات التعبيرية الفرعية للبناء السردي لكل أغنية منهما.</p>
+            </div>
+
+            <div id="part6" class="tab-content">
+                <h2>Part 6 — Ranked Retrieval (TF Scoring)</h2>
+                <div class="description-box">
+                    في الأنظمة المتقدمة، لا يكتفي المستخدم بالبحث المنطقي (نعم أو لا) بل يريد ترتيباً تصاعدياً حسب الأكثر صلة. تم استخدام نظام <strong>Ranked Retrieval</strong> يعتمد على حساب تكرار الكلمات المستعلم عنها (Term Frequency - TF) داخل المستند لترتيب النتائج.
+                </div>
+
+                <div class="example-box" style="background-color: var(--primary-color); color: white;">
+                    <p><strong>الاستعلام المدخل (Query):</strong> "dark electronic pop"</p>
+                    <p><strong>الاستعلام بعد المعالجة (Stemmed Query):</strong> <span class="token" style="color:#000;">'dark'</span>, <span class="token" style="color:#000;">'electron'</span>, <span class="token" style="color:#000;">'pop'</span></p>
+                </div>
+
+                <h3>جدول ترتيب المستندات المسترجعة بناءً على الـ TF-Score:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align:center; width: 10%;">الترتيب</th>
+                            <th>معرف المستند (Doc ID)</th>
+                            <th>عنوان ومؤدي الأغنية (Title)</th>
+                            <th style="text-align:center;">مجموع التكرارات (Score)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background-color: rgba(212, 175, 55, 0.15);">
+                            <td style="text-align:center;">🥇 1</td>
+                            <td><strong>D8</strong></td>
+                            <td>Starboy - The Weeknd</td>
+                            <td style="text-align:center; font-weight:700; color:var(--primary-color);">4</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">🥈 2</td>
+                            <td><strong>D14</strong></td>
+                            <td>Bad Guy - Billie Eilish</td>
+                            <td style="text-align:center; font-weight:700;">3</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">🥉 3</td>
+                            <td><strong>D19</strong></td>
+                            <td>Smooth Criminal - Michael Jackson</td>
+                            <td style="text-align:center; font-weight:700;">2</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">4</td>
+                            <td><strong>D1</strong></td>
+                            <td>Shape of You - Ed Sheeran</td>
+                            <td style="text-align:center;">1</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">5</td>
+                            <td><strong>D2</strong></td>
+                            <td>Blinding Lights - The Weeknd</td>
+                            <td style="text-align:center;">1</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 1.5rem;">التحليل الأكاديمي للترتيب:</h3>
+                <p>احتل المستند <strong>D8</strong> المرتبة الأولى كأعلى تطابق تام وعلامة استحقاق صلة لأن الكلمات المستعلم عنها تكررت فيه بشكل مكثف على النحو التالي: (تكررت كلمة <code style="font-family: monospace;">dark=2</code> مرتين، وتكررت كلمة <code style="font-family: monospace;">electron=1</code> مرة واحدة، وكلمة <code style="font-family: monospace;">pop=1</code> مرة واحدة) ليصبح مجموع الـ Score الكلي يساوي 4.</p>
+            </div>
+
+            <div id="part7" class="tab-content">
+                <h2>Part 7 — Tolerant Retrieval & Spelling Correction</h2>
+                <div class="description-box">
+                    يتعامل محرك البحث بذكاء مرن مع الأخطاء الإملائية والطباعية للمستخدمين، بالإضافة إلى دعم الرموز التعبيرية للبحث عن الجذور الناقصة (Wildcard Queries).
+                </div>
+
+                <h3>1) مسافة التعديل (Levenshtein Edit Distance):</h3>
+                <p>مصفوفة البرمجة الديناميكية (Dynamic Programming Matrix) لتصحيح الخطأ الإملائي من الكلمة المدخلة خطأً <code style="color:red">"gutar"</code> إلى المصطلح الصحيح في الفهرس <code style="color:green">"guitar"</code>:</p>
+                
+                <div class="matrix-wrapper">
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>-</th>
+                                <th>-</th>
+                                <th>g</th>
+                                <th>u</th>
+                                <th>i</th>
+                                <th>t</th>
+                                <th>a</th>
+                                <th>r</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>-</th>
+                                <td>0</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
+                                <td>5</td>
+                                <td>6</td>
+                            </tr>
+                            <tr>
+                                <th>g</th>
+                                <td>1</td>
+                                <td class="highlight-cell">0</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <th>u</th>
+                                <td>2</td>
+                                <td>1</td>
+                                <td class="highlight-cell">0</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
+                            </tr>
+                            <tr>
+                                <th>t</th>
+                                <td>3</td>
+                                <td>2</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td class="highlight-cell">1</td>
+                                <td>2</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <th>a</th>
+                                <td>4</td>
+                                <td>3</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td class="highlight-cell">1</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <th>r</th>
+                                <td>5</td>
+                                <td>4</td>
+                                <td>3</td>
+                                <td>3</td>
+                                <td>3</td>
+                                <td>2</td>
+                                <td class="highlight-cell" style="background-color: #4ade80; color: #000;">1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="text-align:center; font-weight: 600; margin-bottom: 2rem;">المسافة النهائية = <strong>1</strong> (تحتاج فقط لعملية إدخال Insertion لحرف 'i' لتصحيح الكلمة).</p>
+
+                <h3>2) قاموس تصحيح الأخطاء (Spelling Correction Results):</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الكلمة الخاطئة المدخلة (Typo Input)</th>
+                            <th>المصطلحات المقترحة البديلة المصححة (Suggested Corrections)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code style="color:red">gutar</code></td>
+                            <td><strong>guitar, star</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code style="color:red">electonic</code></td>
+                            <td><strong>electron, electr</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code style="color:red">rythm</code></td>
+                            <td><strong>rhythm, theme</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code style="color:red">acustic</code></td>
+                            <td><strong>tactic, acoust</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">3) البحث العام المبتور (Wildcard Search):</h3>
+                <ul>
+                    <li><strong><code style="font-family: monospace;">rock*</code></strong> &rarr; المطابقات المستخرجة: <span class="token">rock</span> &rarr; الوثائق المرتبطة: <span class="token">D3, D5, D11, D17</span></li>
+                    <li><strong><code style="font-family: monospace;">*lyric*</code></strong> &rarr; المطابقات المستخرجة: <span class="token">lyric</span> &rarr; الوثائق المرتبطة: <span class="token">D1, D7, D8, D20</span></li>
+                    <li><strong><code style="font-family: monospace;">*op</code></strong> &rarr; المطابقات المستخرجة: <span class="token">develop, loop, pop</span> &rarr; الوثائق المرتبطة: <span class="token">D1, D4, D6, D8, D9, D10, D12, D13, D14, D15, D18, D19, D20</span></li>
+                </ul>
+            </div>
+
+            <div id="conclusion" class="tab-content">
+                <h2>الخاتمة والتطلعات المستقبلية (Conclusion)</h2>
+                <div class="description-box">
+                    تم بحمد الله بناء محرك البحث المصغر <strong>Mini Search Engine</strong> المتكامل بنجاح مبرهناً على القوة الهندسية والرياضية لمبادئ استرجاع المعلومات (Information Retrieval).
+                </div>
+
+                <h3 style="margin-top: 1.5rem;"><i class="fa-solid fa-square-check" style="color: green;"></i> ما تم إنجازه واجتيازه بالكامل:</h3>
+                <p>بناء وهيكلة الـ Inverted Index لـ 20 وثيقة معقدة، تطبيق خط معالجة معقد ومقنن، إجراء استعلامات Boolean حازمة بدقة متناهية، تطبيق أنظمة الـ Ranking والـ Edit Distance للتعامل المرن مع المستخدم.</p>
+
+                <h3 style="margin-top: 2rem;"><i class="fa-solid fa-lightbulb" style="color: var(--accent-color);"></i> التطلعات والتحسينات المستقبلية المقترحة (Future Work):</h3>
+                <table style="margin-top: 1rem;">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">التحسين المقترح</th>
+                            <th>الأثر الإيجابي على محرك البحث</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>تطبيق وزن TF-IDF</strong></td>
+                            <td>إعطاء الكلمات النادرة والفريدة أهمية ووزن أعلى في الترتيب الرياضي بدلاً من الاعتماد المطلق على مجرد تكرار الكلمة العادي.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>واجهة مستخدم حقيقية (Search Bar)</strong></td>
+                            <td>بناء وتطوير واجهة ويب ديناميكية تفاعلية تضم شريط بحث تفاعلي مع ظهور فوري ومباشر لنتائج البحث أثناء الكتابة (AJAX Search).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>التوسع الحجمي لقاعدة البيانات</strong></td>
+                            <td>توسيع قاعدة البيانات لتشمل آلاف الأغاني والمقالات وتطبيق تقنيات فهارس متقدمة مثل الـ B-Trees أو Skip Lists لتسريع عمليات الدمج.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <footer>
+        <p>© مشروع مادة استرجاع المعلومات (IR Course Project) - تم الإعداد والتصميم بكل احترافية ودقة.</p>
+    </footer>
+
+    <script>
+        function openTab(evt, tabId) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Remove active class from all tab buttons
+            const tabButtons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+
+            // Show current tab content and activate the clicked button
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            // Smooth scroll to content top on mobile screens
+            if (window.innerWidth <= 992) {
+                document.querySelector('.content-panel').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>
